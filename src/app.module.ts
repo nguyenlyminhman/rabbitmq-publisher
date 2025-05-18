@@ -6,10 +6,10 @@ import { FanoutModule } from './modules/fanout/fanout.module';
 import { TopicModule } from './modules/topic/topic.module';
 import { DirectModule } from './modules/direct/direct.module';
 import { HeadersModule } from './modules/headers/headers.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule } from '@nestjs/config';
 import { AppConfigService } from './shared/app-config.service';
-import { RabbitMqService } from './shared/rabbit-config.service';
+import { RbmqModule } from './rbmq/rbmq.module';
+import { SeedingRabbitMqService } from './shared/seeding-rabbitmq.service';
 
 @Module({
   imports: [
@@ -17,30 +17,18 @@ import { RabbitMqService } from './shared/rabbit-config.service';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    // ClientsModule.register([
-    //   {
-    //     name: 'RABBITMQ_SERVICE',  // Unique identifier for the client
-    //     transport: Transport.RMQ,
-    //     options: {
-    //       urls: ['amqps://iyksiimp:DeUCNk-jKZpW-NFtdn0iUNbHG4o9Wa6d@armadillo.rmq.cloudamqp.com/iyksiimp'],  // RabbitMQ URL
-    //       queue: 'default_queue',  // Default queue name (can be overridden)
-    //       queueOptions: {
-    //         durable: false,  // Whether the queue should survive restarts
-    //       }
-    //     },
-    //   },
-    // ]),
     SharedModule,
-    FanoutModule, 
-    TopicModule, 
-    DirectModule, 
-    HeadersModule
+    FanoutModule,
+    TopicModule,
+    DirectModule,
+    HeadersModule,
+    RbmqModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     AppConfigService,
-    RabbitMqService
+    SeedingRabbitMqService
   ],
 })
-export class AppModule {}
+export class AppModule { }
