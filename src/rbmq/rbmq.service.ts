@@ -16,8 +16,6 @@ export class RbmqService {
 
       const RABBIT_URL = `amqps://${USERNAME}:${PASSWORD}@${HOST}`; 
       
-      console.log(RABBIT_URL);
-
       return {
         transport: Transport.RMQ,
         options: {

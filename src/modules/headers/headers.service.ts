@@ -1,11 +1,11 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { EHeader } from 'src/objects/enums/headers.enum';
+import { EHeaders } from 'src/objects/enums/headers.enum';
 
 @Injectable()
 export class HeadersService {
     constructor(
-        @Inject(EHeader.HEADER_QUEUE) private rmq: ClientProxy,
+        @Inject(EHeaders.HEADERS_QUEUE) private rmq: ClientProxy,
     ) { }
 
     async pushMsgPdf() {
@@ -19,9 +19,9 @@ export class HeadersService {
                 }
             }
 
-            return this.rmq.emit({ ...headers }, { msg: 'hello world from Pdf with ' + EHeader.HEADER_QUEUE });
+            return this.rmq.emit({ ...headers }, { msg: 'hello world from Pdf with ' + EHeaders.HEADERS_QUEUE });
         } catch (err) {
-            console.log(EHeader.HEADER_QUEUE, err);
+            console.log(EHeaders.HEADERS_QUEUE, err);
             throw new BadRequestException(err);
         }
     }
@@ -38,9 +38,9 @@ export class HeadersService {
                 }
             }
 
-            return this.rmq.emit({ ...headers }, { msg: 'hello world from Json with ' + EHeader.HEADER_QUEUE });
+            return this.rmq.emit({ ...headers }, { msg: 'hello world from Json with ' + EHeaders.HEADERS_QUEUE });
         } catch (err) {
-            console.log(EHeader.HEADER_QUEUE, err);
+            console.log(EHeaders.HEADERS_QUEUE, err);
             throw new BadRequestException(err);
         }
     }

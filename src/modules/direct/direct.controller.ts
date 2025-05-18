@@ -6,13 +6,18 @@ export class DirectController {
 
     constructor(private directService: DirectService) { }
 
-    @Post("/q01")
-    async q1() {
+    @Post("/exchange")
+    async pushExchange() {
+        return this.directService.pushExchange();
+    }
+
+    @Post("/queue/q01")
+    async pushMsgQ1() {
         return this.directService.pushMsgQ1();
     }
 
     @Post("/q02")
-    async q2() {
+    async pushMsgQ2() {
         return this.directService.pushMsgQ2();
     }
 }

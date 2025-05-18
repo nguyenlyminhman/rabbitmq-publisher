@@ -12,24 +12,29 @@ interface RbmqModuleOptions {
 })
 export class RbmqModule {
   static register({ queueName }: RbmqModuleOptions): DynamicModule {
-    console.log(queueName);
-    
+
     return {
       module: RbmqModule,
       imports: [
         ClientsModule.registerAsync([
           {
             name: queueName,
-            useFactory: (configService: ConfigService) => (
-              
+            useFactory: (configService: ConfigService) => {
 
-               {
-              transport: Transport.RMQ,
-              options: {
-                urls: [`amqps://iyksiimp:DeUCNk-jKZpW-NFtdn0iUNbHG4o9Wa6d@armadillo.rmq.cloudamqp.com/iyksiimp`],
-                queue: queueName,
-              },
-            }),
+              const USERNAME = configService.get<string>('RABBIT_USERNAME');
+              const PASSWORD = configService.get<string>('RABBIT_PASSWORD');
+              const HOST = configService.get<string>('RABBIT_HOST');
+
+              const RABBIT_URL = `amqps://${USERNAME}:${PASSWORD}@${HOST}`;
+
+              return {
+                transport: Transport.RMQ,
+                options: {
+                  urls: [`${RABBIT_URL}`],
+                  queue: queueName,
+                },
+              }
+            },
             inject: [ConfigService],
           },
         ]),

@@ -3,6 +3,7 @@ import { DirectController } from './direct.controller';
 import { DirectService } from './direct.service';
 import { RbmqModule } from 'src/rbmq/rbmq.module';
 import { EDirect } from 'src/objects/enums/direct.enum';
+import { RbmqPublishExchangeService } from 'src/rbmq/rbmqExchange.service';
 
 @Module({
   imports: [
@@ -10,7 +11,8 @@ import { EDirect } from 'src/objects/enums/direct.enum';
   ],
   controllers: [DirectController],
   providers: [
-    DirectService
+    DirectService,
+    RbmqPublishExchangeService
   ]
 })
 export class DirectModule { }
