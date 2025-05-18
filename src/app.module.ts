@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppConfigService } from './shared/app-config.service';
 import { RbmqModule } from './rbmq/rbmq.module';
 import { SeedingRabbitMqService } from './shared/seeding-rabbitmq.service';
+import { RbmqPublishExchangeService } from './rbmq/rbmqExchange.service';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { SeedingRabbitMqService } from './shared/seeding-rabbitmq.service';
   providers: [
     AppService,
     AppConfigService,
-    SeedingRabbitMqService
+    SeedingRabbitMqService,
+    RbmqPublishExchangeService
   ],
 })
 export class AppModule { }
