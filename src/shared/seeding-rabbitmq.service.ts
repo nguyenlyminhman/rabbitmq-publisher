@@ -4,7 +4,10 @@ import * as amqp from 'amqplib';
 import { EDirect } from 'src/objects/enums/direct.enum';
 import { EFanout } from 'src/objects/enums/fanout.enum';
 import { EHeaders } from 'src/objects/enums/headers.enum';
+import { QueueType } from 'src/objects/enums/queue.type.enum';
 import { ETopic } from 'src/objects/enums/topic.enum';
+import { directQueueRtk } from 'src/objects/queue/directEx.queue';
+import { IQueue } from 'src/objects/queue/IQueue';
 
 @Injectable()
 export class SeedingRabbitMqService implements OnModuleInit, OnModuleDestroy {
@@ -12,18 +15,17 @@ export class SeedingRabbitMqService implements OnModuleInit, OnModuleDestroy {
   private connection : amqp.Connection;
   private channel : amqp.Channel;
   private RABBIT_URL : String;
-
-
-  private FANOUT = 'fanout';
-  private DIRECT = 'direct';
-  private TOPIC = 'topic';
-  private HEADERS = 'headers';
   
   private publisherFanout = EFanout.FANOUT_EXCHANGE;
   private publisherDirect = EDirect.DIRECT_EXCHANGE;
   private publisherTopic =  ETopic.TOPIC_EXCHANGE;
   private publisherHeader = EHeaders.HEADERS_EXCHANGE;
-  
+
+  private publisherDirectExchange = 'publisher.direct.queue';
+  private publisherTopicExchange = 'publisher.topic.queue';
+  private publisherFanoutExchange = 'publisher.fanout.queue';
+  private publisherHeadersExchange = 'publisher.headers.queue';
+
     constructor(private readonly configService: ConfigService) {
       const USERNAME = this.configService.get<string>('RABBIT_USERNAME');
       const PASSWORD = this.configService.get<string>('RABBIT_PASSWORD');
@@ -45,13 +47,12 @@ export class SeedingRabbitMqService implements OnModuleInit, OnModuleDestroy {
 
 
     // Using for push message to Queue with pattern
-    this.seedingExchangeAndBindingQueue(this.publisherFanout, this.FANOUT, true, fanoutQueues);
-    this.seedingExchangeAndBindingQueue(this.publisherDirect, this.DIRECT, true, directQueues);
-    this.seedingExchangeAndBindingQueue(this.publisherTopic, this.TOPIC, true, topicQueues);
-    this.seedingExchangeAndBindingQueue(this.publisherHeader, this.HEADERS, true, headersQueues);
-
-
-    // this.seedingExchangeAndBindingQueueWithRoutingKey();
+    this.seedingExchangeAndBindingQueue(this.publisherFanout, QueueType.FANOUT, true, fanoutQueues);
+    this.seedingExchangeAndBindingQueue(this.publisherDirect, QueueType.DIRECT, true, directQueues);
+    this.seedingExchangeAndBindingQueue(this.publisherTopic, QueueType.TOPIC, true, topicQueues);
+    this.seedingExchangeAndBindingQueue(this.publisherHeader, QueueType.HEADERS, true, headersQueues);
+  
+    this.seedingExchangeAndBindingQueueWithRoutingKey(this.publisherDirectExchange, QueueType.DIRECT, true, directQueueRtk);
     }
 
   async seedingExchangeAndBindingQueue(exchangeName: string, exchangeType: string, durable: boolean, queueList: string[] ) {
@@ -65,7 +66,15 @@ export class SeedingRabbitMqService implements OnModuleInit, OnModuleDestroy {
     } 
   }
 
-  async seedingExchangeAndBindingQueueWithRoutingKey(exchangeName: string, exchangeType: string, durable: boolean, queueList: string[] ) {
+  async seedingExchangeAndBindingQueueWithRoutingKey(exchangeName: string, exchangeType: string, durable: boolean, queueList: Array<IQueue>) {
+    await this.channel.assertExchange(exchangeName, exchangeType, { durable: durable });
+    
+    for (const queue of queueList) {
+      await this.channel.unbindQueue(queue.name, exchangeName, queue.rtk);
+      await this.channel.assertQueue(queue.name, { durable: true });
+      await this.channel.bindQueue(queue.name, exchangeName, queue.rtk);
+      console.log(`Queue ${queue.name} with rtk ${queue.rtk} is bound to ${exchangeType} exchange ${exchangeName}`);
+    } 
 
   }
 
