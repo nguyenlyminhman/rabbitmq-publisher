@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import * as amqp from 'amqplib';
 import { ConfigService } from '@nestjs/config';
+import { EExchange } from 'src/objects/enums/exchange.enum';
 
 @Injectable()
 export class RbmqPublishExchangeService implements OnModuleInit, OnModuleDestroy {
@@ -20,26 +21,26 @@ export class RbmqPublishExchangeService implements OnModuleInit, OnModuleDestroy
     this.channel = await this.connection.createChannel();
   }
 
-  async publishToDirect(exchange: string, routingKey: string, message: any) {
-    await this.channel.assertExchange(exchange, 'direct', { durable: true });
+  async publishToDirect(routingKey: string, message: any) {
+    const exchange = EExchange.PublisherDirectQueue;
     const buffer = Buffer.from(JSON.stringify(message));
     this.channel.publish(exchange, routingKey, buffer);
   }
 
-  async publishToTopic(exchange: string, routingKey: string, message: any) {
-    await this.channel.assertExchange(exchange, 'topic', { durable: true });
+  async publishToTopic(routingKey: string, message: any) {
+    const exchange = EExchange.PublisherTopicQueue;
     const buffer = Buffer.from(JSON.stringify(message));
     this.channel.publish(exchange, routingKey, buffer);
   }
 
-  async publishToFanout(exchange: string, routingKey: string, message: any) {
-    await this.channel.assertExchange(exchange, 'fanout', { durable: true });
+  async publishToFanout(routingKey: string, message: any) {
+    const exchange = EExchange.PublisherFanoutQueue;
     const buffer = Buffer.from(JSON.stringify(message));
     this.channel.publish(exchange, routingKey, buffer);
   }
 
-  async publishToHeader(exchange: string, routingKey: string, message: any) {
-    await this.channel.assertExchange(exchange, 'headers', { durable: true });
+  async publishToHeader(routingKey: string, message: any) {
+    const exchange = EExchange.PublisherHeadersQueue;
     const buffer = Buffer.from(JSON.stringify(message));
     this.channel.publish(exchange, routingKey, buffer);
   }
