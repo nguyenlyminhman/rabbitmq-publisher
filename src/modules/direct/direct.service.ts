@@ -1,6 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { EDirect } from 'src/objects/enums/direct.enum';
+import { EDirectRtk } from 'src/objects/exchange/directEx.queue';
 import { RbmqPublishExchangeService } from 'src/rbmq/rbmqExchange.service';
 
 @Injectable()
@@ -13,9 +14,19 @@ export class DirectService {
         private readonly rmqPublishExchange: RbmqPublishExchangeService
     ) { }
 
-    async pushExchange() {
+    async pushExchangeRtk01() {
         try {
-            return this.rmqPublishExchange.publishToDirect('drex_queue', '', { msg: 'hello world from ' + EDirect.DIRECT_QUEUE })
+            const rtk = EDirectRtk.rtk_01;
+            return this.rmqPublishExchange.publishToDirect(rtk, { msg: 'Hello world from Rtk 01', yoho: 'ecec'})
+        } catch (err) {
+            throw new BadRequestException(err);
+        }
+    }
+
+    async pushExchangeRtk02() {
+        try {
+            const rtk = EDirectRtk.rtk_02;
+            return this.rmqPublishExchange.publishToDirect(rtk, { msg: 'Hello world from Rtk 02', yoho: 'ecec'})
         } catch (err) {
             throw new BadRequestException(err);
         }
