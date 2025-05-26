@@ -1,4 +1,4 @@
-export const VERSION_1 = '1';
+
 
 export enum EFanout {
     FANOUT_EXCHANGE = 'publisher.fanout',
